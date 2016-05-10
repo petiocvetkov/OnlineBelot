@@ -1,28 +1,26 @@
 package com.example.petio.onlinebelote;
 
-import android.os.StrictMode;
+import android.content.Intent;
+import android.preference.PreferenceActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.entity.StringEntity;
+
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.loopj.android.http.*;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.nio.charset.StandardCharsets;
+
 
 public class LoginActivity extends AppCompatActivity {
-    private EditText pass;
-    private EditText username;
+    private String pass;
+    private String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,41 +29,63 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void logIn(View v) throws IOException, JSONException {
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-        URL url = new URL("https://boiling-escarpment-23088.herokuapp.com/users/login");
-        HttpURLConnection con = (HttpURLConnection) (url).openConnection();
+        AsyncHttpClient client = new AsyncHttpClient();
+        AsyncHttpResponseHandler responseHandler = new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int i, Header[] headers, byte[] bytes) {
+                boolean loged;
+                     loged = textFrom(new String(bytes));
+                Intent intent = new Intent(getApplicationContext(), AccountActivity.class);
+                intent.putExtra("account_username", username.toString());
+                startActivity(intent);
+            }
 
-        con.setRequestMethod("POST");
+            @Override
+            public void onFailure(int i, Header[] headers, byte[] bytes, Throwable throwable) {
+                        Toast
+                        .makeText(getApplicationContext(), "Wrong username or password", Toast.LENGTH_SHORT)
+                        .show();
+            }
+        };
+        String url = "https://boiling-escarpment-23088.herokuapp.com/users/login";
+        username = ((EditText) findViewById(R.id.username))
+                    .getText()
+                    .toString();
+        pass = ((EditText) findViewById(R.id.password))
+                .getText()
+                .toString();
 
-        con.setDoInput(true);
+        JSONObject jsonParams = new JSONObject();
 
-        con.setDoOutput(true);
+        jsonParams.put("username", username);
+        jsonParams.put("password",pass);
 
-        con.connect();
-        JSONObject user = new JSONObject();
+        StringEntity entity = new StringEntity(jsonParams.toString());
+       client.post(this, url, entity, "application/json",
+                responseHandler);
 
-        username = (EditText) findViewById(R.id.et_Username);
-        pass = (EditText) findViewById(R.id.et_Password);
+    }
 
-        user.put("username", username.toString());
-        user.put("password", pass.toString());
-        Toast.makeText(LoginActivity.this, user.toString(), Toast.LENGTH_SHORT).show();
+    public boolean textFrom(String strr) {
+        String str = new String(strr);
+        JSONObject json  = null;
+        String usernam = null;
 
-        con.getOutputStream().write((user).toString().getBytes());
+        try {
+            json = new JSONObject(str);
+            usernam = json
+                    .get("username")
+                    .toString();
 
-        StringBuilder sb = new StringBuilder();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-        byte[] b = new byte[1024];
-
-        InputStream is = con.getInputStream();
-        StringBuilder buffer = new StringBuilder();
-        while (is.read(b) != -1)
-            buffer.append(new String(b));
-
-        con.disconnect();
-
-
+        if(usernam.equals(username.toString())) {
+            return true;
+        }else {
+            return false;
+        }
     }
 
 
