@@ -24,14 +24,14 @@
         android:layout_height="wrap_content"
         android:text="Refresh"
         android:id="@+id/refresh_bt"
-        android:layout_below="@+id/listView"
+        android:layout_below="@+id/listRooms"
         android:layout_centerHorizontal="true"
         android:onClick="refreshRooms"/>
 
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/listView"
+        android:id="@+id/listRooms"
         android:layout_above="@+id/join_bt"
         android:layout_toLeftOf="@+id/refresh_bt"
         android:layout_toStartOf="@+id/refresh_bt" />

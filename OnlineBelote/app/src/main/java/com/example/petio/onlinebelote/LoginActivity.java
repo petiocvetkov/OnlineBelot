@@ -33,8 +33,7 @@ public class LoginActivity extends AppCompatActivity {
         AsyncHttpResponseHandler responseHandler = new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int i, Header[] headers, byte[] bytes) {
-                boolean loged;
-                     loged = textFrom(new String(bytes));
+                textFrom(new String(bytes));
                 Intent intent = new Intent(getApplicationContext(), AccountActivity.class);
                 intent.putExtra("account_username", username.toString());
                 startActivity(intent);
