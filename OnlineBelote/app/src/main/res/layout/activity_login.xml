@@ -13,19 +13,19 @@
         android:id="@+id/tv_Username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/et_Username"
+        android:layout_above="@+id/username"
         android:layout_alignEnd="@+id/tv_Password"
         android:layout_alignRight="@+id/tv_Password"
         android:layout_marginBottom="27dp"
         android:text="Username" />
 
     <EditText
-        android:id="@+id/et_Username"
+        android:id="@+id/username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/tv_Password"
-        android:layout_alignLeft="@+id/et_Password"
-        android:layout_alignStart="@+id/et_Password"
+        android:layout_alignLeft="@+id/password"
+        android:layout_alignStart="@+id/password"
         android:layout_marginBottom="38dp"
         android:ems="10">
 
@@ -36,13 +36,13 @@
         android:id="@+id/tv_Password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/et_Password"
+        android:layout_above="@+id/password"
         android:layout_alignLeft="@+id/bt_SignIn"
         android:layout_alignStart="@+id/bt_SignIn"
         android:text="Password" />
 
     <EditText
-        android:id="@+id/et_Password"
+        android:id="@+id/password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/bt_SignIn"
@@ -59,6 +59,6 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="162dp"
         android:onClick="logIn"
-        android:text="LogIn or register me" />
+        android:text="LogIn" />
 
 </RelativeLayout>
