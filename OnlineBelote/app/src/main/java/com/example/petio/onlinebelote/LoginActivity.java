@@ -28,6 +28,12 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
     }
 
+    public void register(View v){
+        Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
+        startActivity(intent);
+
+    }
+
     public void logIn(View v) throws IOException, JSONException {
         AsyncHttpClient client = new AsyncHttpClient();
         AsyncHttpResponseHandler responseHandler = new AsyncHttpResponseHandler() {

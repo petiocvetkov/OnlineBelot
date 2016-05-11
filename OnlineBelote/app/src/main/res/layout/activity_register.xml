@@ -7,7 +7,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".LoginActivity">
+    tools:context="com.example.petio.onlinebelote.RegisterActivity">
 
     <TextView
         android:id="@+id/tv_Username"
@@ -30,7 +30,6 @@
         android:ems="10">
 
     </EditText>
-
     <TextView
         android:id="@+id/tv_Password"
         android:layout_width="wrap_content"
@@ -57,17 +56,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="162dp"
-        android:onClick="logIn"
-        android:text="LogIn" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Register"
-        android:id="@+id/button"
-        android:layout_marginTop="53dp"
-        android:layout_alignTop="@+id/bt_SignIn"
-        android:layout_centerHorizontal="true"
-        android:onClick="register"/>
+        android:onClick="register"
+        android:text="Register" />
 
 </RelativeLayout>

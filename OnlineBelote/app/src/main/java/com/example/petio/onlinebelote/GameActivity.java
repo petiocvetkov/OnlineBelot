@@ -57,7 +57,7 @@ public class GameActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Log.d("json seks",s);
+                        Log.d("json",s);
                         formatJsonFromServer(s);
                     }
                 });
@@ -91,9 +91,9 @@ public class GameActivity extends AppCompatActivity {
                 //cardsInHands = new JSONArray(cards);
                // cardsInHand(new JSONArray(cardsInHand));
 
-                game = new Game(cardsString);
+               // game = new Game(cardsString);
                 //game.run();
-                game.load();
+                //game.load();
 
             }else {
 
