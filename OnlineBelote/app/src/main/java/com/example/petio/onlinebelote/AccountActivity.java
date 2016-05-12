@@ -1,5 +1,6 @@
 package com.example.petio.onlinebelote;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,18 +20,22 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.entity.StringEntity;
 
 public class AccountActivity extends AppCompatActivity {
     private ArrayList<String> rooms = new ArrayList<>();
     ArrayAdapter<String> roomsAdapter;
 
-    private HashMap<String,JSONObject> roomsMap = new HashMap<>();
+    private HashMap<String, JSONObject> roomsMap = new HashMap<>();
     private ListView roomsList;
     private String username;
+    private JSONObject selectedRoom;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,10 +43,10 @@ public class AccountActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-             username = extras.getString("account_username");
+            username = extras.getString("account_username");
         }
 
-        roomsAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,rooms);
+        roomsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, rooms);
         roomsList = (ListView) findViewById(R.id.listRooms);
 
 
@@ -49,23 +55,24 @@ public class AccountActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                try{
-                    for (int ctr=0;ctr<=rooms.size();ctr++){
-                        if(i==ctr){
+                try {
+                    for (int ctr = 0; ctr <= rooms.size(); ctr++) {
+                        if (i == ctr) {
                             roomsList.getChildAt(ctr).setBackgroundColor(Color.CYAN);
-                        }else{
+                            selectedRoom = roomsMap.get(rooms.get(i));
+                        } else {
                             roomsList.getChildAt(ctr).setBackgroundColor(Color.WHITE);
                         }
                     }
-                }
-                catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
 
     }
-    public void refreshRooms(View view){
+
+    public void refreshRooms(View view) throws JSONException, UnsupportedEncodingException {
         String url = "https://boiling-escarpment-23088.herokuapp.com/rooms/get";
         AsyncHttpClient client = new AsyncHttpClient();
         AsyncHttpResponseHandler responseHandler = new AsyncHttpResponseHandler() {
@@ -79,16 +86,21 @@ public class AccountActivity extends AppCompatActivity {
             @Override
             public void onFailure(int i, Header[] headers, byte[] bytes, Throwable throwable) {
                 Toast
-                        .makeText(getApplicationContext(), "No found rooms", Toast.LENGTH_SHORT)
+                        .makeText(getApplicationContext(), "Problem with joining or the romm is full", Toast.LENGTH_SHORT)
                         .show();
             }
         };
+        JSONObject jsonParams = new JSONObject();
 
+        jsonParams.put("id", selectedRoom.get("_id").toString());
 
+        StringEntity entity = new StringEntity(jsonParams.toString());
 
-        client.get(this, url, responseHandler);
+        client.post(this, url, entity,"application/json",
+                responseHandler);
     }
-    public void formatJson(String json){
+
+    public void formatJson(String json) {
         JSONArray jsonArray = null;
         rooms.clear();
         try {
@@ -97,7 +109,7 @@ public class AccountActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        for(int i = 0; i < jsonArray.length(); i++){
+        for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonobject = null;
             try {
                 jsonobject = jsonArray.getJSONObject(i);
@@ -113,10 +125,60 @@ public class AccountActivity extends AppCompatActivity {
         }
 
     }
-    public void displayRooms(ArrayList<String> visited,ArrayAdapter<String> adapter) {
+
+    public void displayRooms(ArrayList<String> visited, ArrayAdapter<String> adapter) {
         adapter.clear();
         adapter.addAll(visited);
         adapter.notifyDataSetChanged();
     }
+
+
+    void join() throws JSONException, UnsupportedEncodingException {
+        AsyncHttpClient client = new AsyncHttpClient();
+        AsyncHttpResponseHandler responseHandler = new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int i, Header[] headers, byte[] bytes) {
+                textFrom(new String(bytes));
+                Intent intent = new Intent(getApplicationContext(), AccountActivity.class);
+                intent.putExtra("account_username", username.toString());
+                startActivity(intent);
+            }
+
+            @Override
+            public void onFailure(int i, Header[] headers, byte[] bytes, Throwable throwable) {
+                Toast
+                        .makeText(getApplicationContext(), "Problem with joining or the room is full", Toast.LENGTH_SHORT)
+                        .show();
+            }
+        };
+        String url = "https://boiling-escarpment-23088.herokuapp.com/users/login";
+
+        JSONObject jsonParams = new JSONObject();
+
+        jsonParams.put("id", selectedRoom.get("_id"));
+
+        StringEntity entity = new StringEntity(jsonParams.toString());
+        client.post(this, url, entity, "application/json",
+                responseHandler);
+
+    }
+
+    public void textFrom(String strr) {
+        String str = new String(strr);
+        JSONObject json = null;
+        String usernam = null;
+
+        try {
+            json = new JSONObject(str);
+            usernam = json
+                    .get("username")
+                    .toString();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return ;
+    }
+
 
 }
