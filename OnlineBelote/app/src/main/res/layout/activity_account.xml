@@ -17,8 +17,12 @@
         android:layout_marginBottom="149dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
+<<<<<<< HEAD
         android:layout_alignParentStart="true"
         android:onClick="join"/>
+=======
+        android:layout_alignParentStart="true" />
+>>>>>>> a7d54e719535156f1e06259fdbf859eb55f93b4a
 
     <Button
         android:layout_width="wrap_content"

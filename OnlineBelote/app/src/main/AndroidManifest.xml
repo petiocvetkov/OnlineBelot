@@ -17,9 +17,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+<<<<<<< HEAD
         <activity android:name=".AccountActivity" />
         <activity android:name=".GameActivity"
             />
+=======
+        <activity android:name=".AccountActivity"></activity>
+>>>>>>> a7d54e719535156f1e06259fdbf859eb55f93b4a
     </application>
 
 </manifest>

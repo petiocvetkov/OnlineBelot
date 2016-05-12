@@ -72,7 +72,11 @@ public class AccountActivity extends AppCompatActivity {
 
     }
 
+<<<<<<< HEAD
     public void refreshRooms(View view)  {
+=======
+    public void refreshRooms(View view) throws JSONException, UnsupportedEncodingException {
+>>>>>>> a7d54e719535156f1e06259fdbf859eb55f93b4a
         String url = "https://boiling-escarpment-23088.herokuapp.com/rooms/get";
         AsyncHttpClient client = new AsyncHttpClient();
         AsyncHttpResponseHandler responseHandler = new AsyncHttpResponseHandler() {
@@ -90,10 +94,20 @@ public class AccountActivity extends AppCompatActivity {
                         .show();
             }
         };
+<<<<<<< HEAD
 
 
 
         client.get(this, url,
+=======
+        JSONObject jsonParams = new JSONObject();
+
+        jsonParams.put("id", selectedRoom.get("_id").toString());
+
+        StringEntity entity = new StringEntity(jsonParams.toString());
+
+        client.post(this, url, entity,"application/json",
+>>>>>>> a7d54e719535156f1e06259fdbf859eb55f93b4a
                 responseHandler);
     }
 
@@ -123,14 +137,31 @@ public class AccountActivity extends AppCompatActivity {
 
     }
 
+<<<<<<< HEAD
 
 
     public void join(View view) throws JSONException, UnsupportedEncodingException {
+=======
+    public void displayRooms(ArrayList<String> visited, ArrayAdapter<String> adapter) {
+        adapter.clear();
+        adapter.addAll(visited);
+        adapter.notifyDataSetChanged();
+    }
+
+
+    void join() throws JSONException, UnsupportedEncodingException {
+>>>>>>> a7d54e719535156f1e06259fdbf859eb55f93b4a
         AsyncHttpClient client = new AsyncHttpClient();
         AsyncHttpResponseHandler responseHandler = new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int i, Header[] headers, byte[] bytes) {
+<<<<<<< HEAD
                 Intent intent = new Intent(getApplicationContext(), GameActivity.class);
+=======
+                textFrom(new String(bytes));
+                Intent intent = new Intent(getApplicationContext(), AccountActivity.class);
+                intent.putExtra("account_username", username.toString());
+>>>>>>> a7d54e719535156f1e06259fdbf859eb55f93b4a
                 startActivity(intent);
             }
 
@@ -141,20 +172,48 @@ public class AccountActivity extends AppCompatActivity {
                         .show();
             }
         };
+<<<<<<< HEAD
         String url = "https://boiling-escarpment-23088.herokuapp.com/rooms/join";
+=======
+        String url = "https://boiling-escarpment-23088.herokuapp.com/users/login";
+>>>>>>> a7d54e719535156f1e06259fdbf859eb55f93b4a
 
         JSONObject jsonParams = new JSONObject();
 
         jsonParams.put("id", selectedRoom.get("_id"));
+<<<<<<< HEAD
         jsonParams.put("username",username);
 
         StringEntity entity = new StringEntity(jsonParams.toString());
 
+=======
+
+        StringEntity entity = new StringEntity(jsonParams.toString());
+>>>>>>> a7d54e719535156f1e06259fdbf859eb55f93b4a
         client.post(this, url, entity, "application/json",
                 responseHandler);
 
     }
 
+<<<<<<< HEAD
+=======
+    public void textFrom(String strr) {
+        String str = new String(strr);
+        JSONObject json = null;
+        String usernam = null;
+
+        try {
+            json = new JSONObject(str);
+            usernam = json
+                    .get("username")
+                    .toString();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return ;
+    }
+>>>>>>> a7d54e719535156f1e06259fdbf859eb55f93b4a
 
 
 }
