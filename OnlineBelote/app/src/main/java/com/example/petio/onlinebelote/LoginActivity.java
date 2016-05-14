@@ -46,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
                         .show();
             }
         };
-        String url = "https://boiling-escarpment-23088.herokuapp.com/users/login";
+        String url = "https://ancient-headland-44863.herokuapp.com/users/login";
         username = ((EditText) findViewById(R.id.username))
                     .getText()
                     .toString();

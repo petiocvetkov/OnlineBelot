@@ -34,7 +34,7 @@ public class AccountActivity extends AppCompatActivity {
     private HashMap<String, JSONObject> roomsMap = new HashMap<>();
     private ListView roomsList;
     private String username;
-    private JSONObject selectedRoom;
+    private JSONObject selectedRoom = new JSONObject() ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +58,7 @@ public class AccountActivity extends AppCompatActivity {
                 try {
                     for (int ctr = 0; ctr <= rooms.size(); ctr++) {
                         if (i == ctr) {
-                            roomsList.getChildAt(ctr).setBackgroundColor(Color.CYAN);
+                            roomsList.getChildAt(ctr).setBackgroundColor(Color.GREEN);
                             selectedRoom = roomsMap.get(rooms.get(i));
                         } else {
                             roomsList.getChildAt(ctr).setBackgroundColor(Color.WHITE);
@@ -73,7 +73,7 @@ public class AccountActivity extends AppCompatActivity {
     }
 
     public void refreshRooms(View view)  {
-        String url = "https://boiling-escarpment-23088.herokuapp.com/rooms/get";
+        String url = "https://ancient-headland-44863.herokuapp.com/rooms/get";
         AsyncHttpClient client = new AsyncHttpClient();
         AsyncHttpResponseHandler responseHandler = new AsyncHttpResponseHandler() {
             @Override
@@ -131,6 +131,13 @@ public class AccountActivity extends AppCompatActivity {
             @Override
             public void onSuccess(int i, Header[] headers, byte[] bytes) {
                 Intent intent = new Intent(getApplicationContext(), GameActivity.class);
+                try {
+                    intent.putExtra("player_name",username.toString());
+                    intent.putExtra("room_id", selectedRoom.get("_id").toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
                 startActivity(intent);
             }
 
@@ -141,7 +148,7 @@ public class AccountActivity extends AppCompatActivity {
                         .show();
             }
         };
-        String url = "https://boiling-escarpment-23088.herokuapp.com/rooms/join";
+        String url = "https://ancient-headland-44863.herokuapp.com/rooms/join";
 
         JSONObject jsonParams = new JSONObject();
 
