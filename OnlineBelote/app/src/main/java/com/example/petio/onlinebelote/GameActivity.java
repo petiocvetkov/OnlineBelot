@@ -1,16 +1,21 @@
 package com.example.petio.onlinebelote;
 
+import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.emitter.Emitter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.Socket;
+import java.net.URISyntaxException;
 import java.util.Scanner;
+import com.github.nkzawa.socketio.client.Socket;
+
 
 public class GameActivity extends AppCompatActivity {
     String host = "ws://ancient-headland-44863.herokuapp.com";
@@ -18,6 +23,23 @@ public class GameActivity extends AppCompatActivity {
     JSONObject joinedPlayer = new JSONObject();
 
     String[] teamOne;
+
+    private Emitter.Listener onNewMessage = new Emitter.Listener() {
+
+
+        @Override
+        public void call(final Object... args) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+
+                    formatJsonFromServer(data);
+
+                }
+            });
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,63 +57,32 @@ public class GameActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                try{
-                    Socket server = new Socket(host,port);
-                    Scanner serverScanner = new Scanner(server.getInputStream());
-                    PrintWriter outWriter =
-                            new PrintWriter(server.getOutputStream());
+        Socket socket;
 
+        try {
+            socket = IO.socket(host);
+            socket.emit(joinedPlayer.toString());
 
-                    String input;
-                    outWriter.write(joinedPlayer.toString());
-                    //while ((input = serverScanner.nextLine()) != null){
-
-                    //      formatJsonFromServer(input);
-                    //}
-
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            while(socket.on("",onNewMessage) != null){
             }
-        };
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
 
-        thread.start();
+
         //startGame();
 
     }
 
-    public void startGame(){
-        try{
-            Socket server = new Socket(host,port);
-            Scanner serverScanner = new Scanner(server.getInputStream());
-            PrintWriter outWriter =
-                    new PrintWriter(server.getOutputStream());
 
 
-            String input;
-            outWriter.write(joinedPlayer.toString());
-            //while ((input = serverScanner.nextLine()) != null){
-
-              //      formatJsonFromServer(input);
-            //}
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void formatJsonFromServer(String input){
-        JSONArray cardsInHand ;
+    private void formatJsonFromServer(JSONObject cardsInHand){
         try {
-            cardsInHand = new JSONArray(input);
             if(cardsInHand.length() == 8){
-                cardsInHand(cardsInHand);
+                cardsInHand(new JSONArray(cardsInHand));
                 return ;
+            }else {
+
             }
 
         } catch (JSONException e) {
@@ -103,5 +94,9 @@ public class GameActivity extends AppCompatActivity {
         for(int i = 0 ; i < cards.length() ; i++){
 
         }
+    }
+
+    public Activity getActivity() {
+        return this;
     }
 }

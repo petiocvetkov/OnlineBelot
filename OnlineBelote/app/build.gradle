@@ -25,4 +25,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.2.1'
     compile files('libs/android-async-http-1.4.9.jar')
+    compile 'com.github.nkzawa:socket.io-client:0.3.0'
+
 }
