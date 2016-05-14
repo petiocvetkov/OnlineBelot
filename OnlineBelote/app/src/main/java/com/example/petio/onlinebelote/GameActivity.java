@@ -1,45 +1,29 @@
 package com.example.petio.onlinebelote;
 
 import android.app.Activity;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.TextView;
 
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.github.nkzawa.socketio.client.IO;
-import com.github.nkzawa.emitter.Emitter;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Scanner;
-import com.github.nkzawa.socketio.client.Socket;
+import java.net.URL;
 
 
 public class GameActivity extends AppCompatActivity {
-    String host = "ws://ancient-headland-44863.herokuapp.com";
+    String host = "http://ancient-headland-44863.herokuapp.com";
     int port = 3000;
     JSONObject joinedPlayer = new JSONObject();
 
-    String[] teamOne;
-
-    private Emitter.Listener onNewMessage = new Emitter.Listener() {
-
-
-        @Override
-        public void call(final Object... args) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    JSONObject data = (JSONObject) args[0];
-
-                    formatJsonFromServer(data);
-
-                }
-            });
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,33 +36,62 @@ public class GameActivity extends AppCompatActivity {
 
         try {
             joinedPlayer.put("playerName",username);
-            joinedPlayer.put("roomId", id);
+            joinedPlayer.put("roomId", "5737a4a496643e0e006dd6d4");
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        Socket socket;
-
+        URI uri;
         try {
-            socket = IO.socket(host);
-            socket.emit(joinedPlayer.toString());
-
-            while(socket.on("",onNewMessage) != null){
-            }
+            uri = new URI(host);
         } catch (URISyntaxException e) {
             e.printStackTrace();
+            return;
         }
+        WebSocketClient mWebSocketClient;
+        mWebSocketClient = new WebSocketClient(uri) {
+            @Override
+            public void onOpen(ServerHandshake serverHandshake) {
+                Log.i("Websocket", "Opened");
+                this.send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL);
+            }
+
+            @Override
+            public void onMessage(final String s) {
+                final String message = s;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        formatJsonFromServer(s);
+                    }
+                });
+            }
+
+            @Override
+            public void onClose(int i, String s, boolean b) {
+                Log.i("Websocket", "Closed " + s);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.i("Websocket", "Error " + e.getMessage());
+            }
+        };
+        mWebSocketClient.connect();
+        mWebSocketClient.send(joinedPlayer.toString());
 
 
-        //startGame();
+
 
     }
 
 
 
-    private void formatJsonFromServer(JSONObject cardsInHand){
+
+    private void formatJsonFromServer(String cardsInHand){
         try {
-            if(cardsInHand.length() == 8){
+            JSONArray cards = new JSONArray(cardsInHand);
+            if(cards.length() == 8){
                 cardsInHand(new JSONArray(cardsInHand));
                 return ;
             }else {
