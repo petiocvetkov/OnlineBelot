@@ -74,6 +74,7 @@ public class AccountActivity extends AppCompatActivity {
 
     public void refreshRooms(View view)  {
         String url = "https://ancient-headland-44863.herokuapp.com/rooms/get";
+
         AsyncHttpClient client = new AsyncHttpClient();
         AsyncHttpResponseHandler responseHandler = new AsyncHttpResponseHandler() {
             @Override
@@ -90,7 +91,6 @@ public class AccountActivity extends AppCompatActivity {
                         .show();
             }
         };
-
 
 
         client.get(this, url,
@@ -126,6 +126,7 @@ public class AccountActivity extends AppCompatActivity {
 
 
     public void join(View view) throws JSONException, UnsupportedEncodingException {
+
         AsyncHttpClient client = new AsyncHttpClient();
         AsyncHttpResponseHandler responseHandler = new AsyncHttpResponseHandler() {
             @Override
@@ -137,7 +138,6 @@ public class AccountActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
                 startActivity(intent);
             }
 
@@ -155,13 +155,11 @@ public class AccountActivity extends AppCompatActivity {
         jsonParams.put("id", selectedRoom.get("_id"));
         jsonParams.put("username",username);
 
-        StringEntity entity = new StringEntity(jsonParams.toString());
 
+        StringEntity entity = new StringEntity(jsonParams.toString());
         client.post(this, url, entity, "application/json",
                 responseHandler);
 
     }
-
-
 
 }
