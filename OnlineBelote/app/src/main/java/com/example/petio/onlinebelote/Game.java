@@ -41,8 +41,9 @@ public class Game extends Engine {
     float screenWidth;
     float screenHeight;
     boolean played;
+    String cardStrings[] ;//= new String[8];
 
-    public Game() {
+    public Game(String[] cardStrings) {
         super(false);
         paint = new Paint();
         canvas = null;
@@ -55,6 +56,7 @@ public class Game extends Engine {
         cards = new BaseSprite[8];
         playedCards = new BaseSprite[8];
         boolean played = false;
+        this.cardStrings = cardStrings;
     }
 
     @Override
@@ -69,7 +71,7 @@ public class Game extends Engine {
         // load ship
         for (int i = 0; i < cards.length; i++) {
             GameTexture current = new GameTexture(this);
-            current.loadFromAsset("pic/7clubs.png");
+            current.loadFromAsset("pic/"+ cardStrings[i] +".png");
             cards[i] = new BaseSprite(
                     this,
                     current.getBitmap().getWidth(),

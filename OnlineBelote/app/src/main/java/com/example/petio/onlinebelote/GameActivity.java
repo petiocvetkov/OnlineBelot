@@ -5,7 +5,6 @@ import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.TextView;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
@@ -13,18 +12,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 
 public class GameActivity extends AppCompatActivity {
     String host = "ws://ancient-headland-44863.herokuapp.com";
-    int port = 3000;
     JSONObject joinedPlayer = new JSONObject();
     JSONArray cardsInHands;
     String cardsString[] = new String[8];
+    Game game;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +34,7 @@ public class GameActivity extends AppCompatActivity {
 
         try {
             joinedPlayer.put("playerName",username);
-            joinedPlayer.put("roomId", id.toString());
+            joinedPlayer.put("roomId", id);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -59,11 +56,10 @@ public class GameActivity extends AppCompatActivity {
 
             @Override
             public void onMessage(final String s) {
-                final String message = s;
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Log.d("json seks",s.toString());
+                        Log.d("json seks",s);
                         formatJsonFromServer(s);
                     }
                 });
@@ -94,9 +90,11 @@ public class GameActivity extends AppCompatActivity {
         try {
             JSONArray cards = new JSONArray(cardsInHand);
             if(cards.length() == 8){
-                cardsInHands = new JSONArray(cards);
+                //cardsInHands = new JSONArray(cards);
                 cardsInHand(new JSONArray(cardsInHand));
-                return ;
+                game = new Game(cardsString);
+                game.run();
+
             }else {
 
             }
