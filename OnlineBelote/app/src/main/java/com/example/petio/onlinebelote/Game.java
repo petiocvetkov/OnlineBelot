@@ -72,7 +72,7 @@ public class Game extends Engine {
         // load ship
         for (int i = 0; i < cards.length; i++) {
             GameTexture current = new GameTexture(this);
-            current.loadFromAsset("pic/"+ cardStrings[i] +".png");
+            current.loadFromAsset(cardStrings[i] +".png");
             cards[i] = new BaseSprite(
                     this,
                     current.getBitmap().getWidth(),
@@ -89,7 +89,7 @@ public class Game extends Engine {
         }
 
         GameTexture tex = new GameTexture(this);
-        if (!tex.loadFromAsset("pic/background.jpg")) {
+        if (!tex.loadFromAsset("background.jpg")) {
             fatalError("Error loading space");
         }
         backGround2X = Bitmap.createBitmap(
