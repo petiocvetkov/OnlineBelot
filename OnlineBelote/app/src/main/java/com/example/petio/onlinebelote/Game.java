@@ -1,127 +1,188 @@
 package com.example.petio.onlinebelote;
 
-
-import android.service.wallpaper.WallpaperService;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.renderscript.Float2;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.lfk.justweengine.Anim.FrameAnimation;
 import com.lfk.justweengine.Anim.MoveAnimation;
 import com.lfk.justweengine.Anim.VelocityAnimation;
-import com.lfk.justweengine.Drawable.Sprite.BaseSub;
+import com.lfk.justweengine.Drawable.Button.TextureButton;
 import com.lfk.justweengine.Engine.Engine;
 import com.lfk.justweengine.Engine.GameTextPrinter;
 import com.lfk.justweengine.Engine.GameTexture;
 import com.lfk.justweengine.Engine.GameTimer;
 import com.lfk.justweengine.Info.UIdefaultData;
-//import com.lfk.justweengine.Sprite.BaseSprite;
-//import com.lfk.justweengine.Sprite.BaseSub;
-//import com.lfk.justweengine.Sprite.FrameType;
+import com.lfk.justweengine.Drawable.Sprite.BaseSprite;
+import com.lfk.justweengine.Drawable.Sprite.BaseSub;
+import com.lfk.justweengine.Drawable.Sprite.FrameType;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.Random;
 
-/**
- * Created by stoeff
- */
-
 public class Game extends Engine {
-    // Please init your var in constructor.
-
     GameTextPrinter printer;
     Paint paint;
     Canvas canvas;
-    Random random;
+    GameTimer timer;
     Bitmap backGround2X;
-    Rect bg_rect;
-    Point bg_scroll;
+    float startX, startY, offsetX, offsetY;
+    BaseSprite[] cards;
+    BaseSprite[] playedCards;
+    Random random;
+    float screenWidth;
+    float screenHeight;
+    boolean played;
 
     public Game() {
-        // If open debug mode. If you open debug mode, you can print log, frame number, and parse on screen.
-        super(true);
+        super(false);
         paint = new Paint();
         canvas = null;
         printer = new GameTextPrinter();
         printer.setTextColor(Color.BLACK);
         printer.setTextSize(24);
         printer.setLineSpaceing(28);
+        timer = new GameTimer();
         random = new Random();
-
+        cards = new BaseSprite[8];
+        playedCards = new BaseSprite[8];
+        boolean played = false;
     }
 
-    // load some UI parameters. And set screen direction, default background color, set screen's scan method.
     @Override
     public void init() {
-        // init UI default par, you must use at here . Some var in UIdefaultData for more phones should be init.
-        UIdefaultData.init(this);
         super.setScreenOrientation(ScreenMode.PORTRAIT);
+        UIdefaultData.init(this);
+        screenWidth = UIdefaultData.screenWidth;
+        screenHeight = UIdefaultData.screenHeight;
     }
-
-    // load sprite , background , picture and other BaseSub
     @Override
     public void load() {
+        // load ship
+        for (int i = 0; i < cards.length; i++) {
+            GameTexture current = new GameTexture(this);
+            current.loadFromAsset("pic/7clubs.png");
+            cards[i] = new BaseSprite(
+                    this,
+                    current.getBitmap().getWidth(),
+                    current.getBitmap().getHeight(),
+                    FrameType.SIMPLE);
+            cards[i].setTexture(current);
+            float customScale = screenWidth / (8 * (float)current.getBitmap().getWidth());
+            cards[i].setScale(customScale);
+            cards[i].setPosition(
+                    i * current.getBitmap().getWidth() * customScale,
+                    screenHeight - current.getBitmap().getHeight() * customScale);
+
+            addToSpriteGroup(cards[i]);
+        }
 
         GameTexture tex = new GameTexture(this);
-        if (!tex.loadFromAsset("background.jpg")) {
+        if (!tex.loadFromAsset("pic/background.jpg")) {
             fatalError("Error loading space");
         }
         backGround2X = Bitmap.createBitmap(
                 UIdefaultData.screenWidth,
-                UIdefaultData.screenHeight * 2,
+                UIdefaultData.screenHeight,
                 Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(backGround2X);
-        Rect dst = new Rect(0, 0, UIdefaultData.screenWidth - 1,
-                UIdefaultData.screenHeight);
-        canvas.drawBitmap(tex.getBitmap(), null, dst, null);
-        dst = new Rect(0, UIdefaultData.screenHeight,
-                UIdefaultData.screenWidth,
+        Rect dst = new Rect(0, 0,
+                UIdefaultData.screenWidth * 2,
                 UIdefaultData.screenHeight * 2);
         canvas.drawBitmap(tex.getBitmap(), null, dst, null);
-
-        bg_rect = new Rect(0, 0, UIdefaultData.screenWidth, UIdefaultData.screenHeight);
-        bg_scroll = new Point(0, 0);
     }
 
 
-    // draw and update in a new Thread
-    // update message and sprite's msg
     @Override
     public void draw() {
-        Canvas canvas = getCanvas();
-        GameTextPrinter printer = new GameTextPrinter(canvas);
-        printer.drawText("Hello", 100, 100);
-
-        GameTexture texture = new GameTexture(this);
-        //king should be k as the json input
-        texture.loadFromAsset("kinghearts.png");
-        //texture.draw(canvas, 100, 100);
-
         canvas = super.getCanvas();
-        canvas.drawBitmap(backGround2X, bg_rect, bg_rect, paint);
+        canvas.drawBitmap(backGround2X,
+                null,
+                new Rect(0, 0, UIdefaultData.screenWidth, UIdefaultData.screenHeight),
+                paint);
         printer.setCanvas(canvas);
-        printer.drawText("Engine demo", 10, 20);
     }
 
     @Override
     public void update() {
-
     }
 
-    // receive touch event , its function depend on screen's scan mode.
     @Override
     public void touch(MotionEvent event) {
-
+        for (int i = 0; i < cards.length; i++) {
+            if (cards[i].getBounds().contains(event.getX(), event.getY()) && played == false) {
+                played = true;
+                cards[i].setPosition(cards[i].getPosition().x, cards[i].getPosition().y / 2);
+                break;
+            }
+        }
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                startX = (int) event.getX();
+                startY = (int) event.getY();
+                break;
+        }
     }
 
-    // receive collision event , BaseSub is the father class of all the sprites and others.
-    // use to solve collision event default use rect collision.
     @Override
     public void collision(BaseSub baseSub) {
-
+        Log.d("LOL", "colliding");
     }
+
+    private void resetEvent(MotionEvent event) {
+        startX = (int) event.getX();
+        startY = (int) event.getY();
+    }
+
+    public static Bitmap compressImage(Bitmap image) {
+        ByteArrayOutputStream baoS = new ByteArrayOutputStream();
+        int options = 100;
+        image.compress(Bitmap.CompressFormat.JPEG, 100, baoS);
+        while (baoS.toByteArray().length / 1024 > 100) {
+            baoS.reset();
+            image.compress(Bitmap.CompressFormat.JPEG, options, baoS);
+            options -= 10;
+        }
+        ByteArrayInputStream isBm = new ByteArrayInputStream(baoS.toByteArray());
+        return BitmapFactory.decodeStream(isBm, null, null);
+    }
+
+
+    public static Bitmap compressWithMeasure(Bitmap image, int width, int height) {
+        ByteArrayOutputStream baoS = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.JPEG, 100, baoS);
+        if (baoS.toByteArray().length / 1024 > 1024) {
+            baoS.reset();
+            image.compress(Bitmap.CompressFormat.JPEG, 50, baoS);
+        }
+        ByteArrayInputStream isBm = new ByteArrayInputStream(baoS.toByteArray());
+        BitmapFactory.Options newOpts = new BitmapFactory.Options();
+        newOpts.inJustDecodeBounds = true;
+        Bitmap bitmap = BitmapFactory.decodeStream(isBm, null, newOpts);
+        newOpts.inJustDecodeBounds = false;
+        int w = newOpts.outWidth;
+        int h = newOpts.outHeight;
+        int be = 1;
+        if (w > h && w > width) {
+            be = newOpts.outWidth / width;
+        } else if (w < h && h > height) {
+            be = newOpts.outHeight / height;
+        }
+        if (be <= 0)
+            be = 1;
+        newOpts.inSampleSize = be;
+        isBm = new ByteArrayInputStream(baoS.toByteArray());
+        bitmap = BitmapFactory.decodeStream(isBm, null, newOpts);
+        return compressImage(bitmap);
+    }
+
+
 }
