@@ -1,7 +1,6 @@
 package com.example.petio.onlinebelote;
 
 import android.app.Activity;
-import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,7 +18,6 @@ import java.net.URISyntaxException;
 public class GameActivity extends AppCompatActivity {
     String host = "ws://ancient-headland-44863.herokuapp.com";
     JSONObject joinedPlayer = new JSONObject();
-    JSONArray cardsInHands;
     String cardsString[] = new String[8];
     Game game;
 
@@ -51,7 +49,7 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onOpen(ServerHandshake serverHandshake) {
                 Log.i("Websocket", "Opened");
-                this.send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL);
+                //this.send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL);
             }
 
             @Override
@@ -91,9 +89,11 @@ public class GameActivity extends AppCompatActivity {
             JSONArray cards = new JSONArray(cardsInHand);
             if(cards.length() == 8){
                 //cardsInHands = new JSONArray(cards);
-                cardsInHand(new JSONArray(cardsInHand));
+               // cardsInHand(new JSONArray(cardsInHand));
+
                 game = new Game(cardsString);
-                game.run();
+                //game.run();
+                game.load();
 
             }else {
 

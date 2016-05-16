@@ -26,6 +26,7 @@ import com.lfk.justweengine.Drawable.Sprite.FrameType;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Objects;
 import java.util.Random;
 
 public class Game extends Engine {
@@ -42,6 +43,7 @@ public class Game extends Engine {
     float screenHeight;
     boolean played;
     String cardStrings[] ;//= new String[8];
+    Objects object;
 
     public Game(String[] cardStrings) {
         super(false);
@@ -56,7 +58,6 @@ public class Game extends Engine {
         cards = new BaseSprite[8];
         playedCards = new BaseSprite[8];
         boolean played = false;
-        this.cardStrings = cardStrings;
     }
 
     @Override
