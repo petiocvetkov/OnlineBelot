@@ -20,10 +20,11 @@ import java.net.URL;
 
 
 public class GameActivity extends AppCompatActivity {
-    String host = "http://ancient-headland-44863.herokuapp.com";
+    String host = "ws://ancient-headland-44863.herokuapp.com";
     int port = 3000;
     JSONObject joinedPlayer = new JSONObject();
-
+    JSONArray cardsInHands;
+    String cardsString[] = new String[8];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +37,7 @@ public class GameActivity extends AppCompatActivity {
 
         try {
             joinedPlayer.put("playerName",username);
-            joinedPlayer.put("roomId", "5737a4a496643e0e006dd6d4");
+            joinedPlayer.put("roomId", id.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -62,6 +63,7 @@ public class GameActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        Log.d("json seks",s.toString());
                         formatJsonFromServer(s);
                     }
                 });
@@ -92,6 +94,7 @@ public class GameActivity extends AppCompatActivity {
         try {
             JSONArray cards = new JSONArray(cardsInHand);
             if(cards.length() == 8){
+                cardsInHands = new JSONArray(cards);
                 cardsInHand(new JSONArray(cardsInHand));
                 return ;
             }else {
@@ -105,7 +108,12 @@ public class GameActivity extends AppCompatActivity {
 
     private void cardsInHand(JSONArray cards){
         for(int i = 0 ; i < cards.length() ; i++){
-
+            try {
+                JSONObject card = new JSONObject((String) cards.get(i));
+                cardsString[i] = card.getString("card") + card.get("paint");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 
