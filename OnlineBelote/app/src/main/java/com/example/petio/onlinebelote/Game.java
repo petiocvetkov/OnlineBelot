@@ -72,6 +72,7 @@ public class Game extends Engine {
         // load ship
         for (int i = 0; i < cards.length; i++) {
             GameTexture current = new GameTexture(getApplicationContext());
+
             current.loadFromAsset(cardStrings[i] +".png");
             cards[i] = new BaseSprite(
                     this,
